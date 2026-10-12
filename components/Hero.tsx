@@ -78,6 +78,11 @@ export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
         style={{ background: "radial-gradient(closest-side, var(--floor), transparent)" }}
       />
 
+      {/* Sur téléphone, la mention se place en haut, au-dessus des instruments */}
+      <p className="eyebrow absolute inset-x-0 top-[96px] z-[3] px-5 text-center md:hidden">
+        {h.eyebrow}
+      </p>
+
       <Carousel
         ready={ready}
         onFrontChange={setFront}
@@ -91,8 +96,8 @@ export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
       <div className="absolute inset-x-0 bottom-0 z-[3] pb-8 md:pb-12">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-7 px-5 md:flex-row md:items-end md:justify-between md:px-8">
           <div className="max-w-[640px]">
-            <p className="eyebrow">{h.eyebrow}</p>
-            <h1 className="font-wide mt-4 text-[clamp(34px,5.2vw,65px)] leading-[1.1]">
+            <p className="eyebrow hidden md:block">{h.eyebrow}</p>
+            <h1 className="font-wide text-[clamp(34px,5.2vw,65px)] leading-[1.1] md:mt-4">
               <span className="sr-only">{h.srTitle}</span>
               {h.words.map((w, i) => (
                 <span key={w}>
