@@ -33,7 +33,7 @@ const ITEMS: Item[] = [
 
 const N = ITEMS.length;
 const STEP = (Math.PI * 2) / N;
-const AUTO_DELAY = 3200;
+const AUTO_DELAY = 2000; // un instrument toutes les 2 secondes
 
 export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
   const [ready, setReady] = useState(false);
@@ -48,7 +48,7 @@ export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
   useEffect(() => {
     if (!ready) return;
     const timers = Array.from({ length: wordCount }, (_, i) =>
-      window.setTimeout(() => setWords(i + 1), 500 + i * AUTO_DELAY * 0.5),
+      window.setTimeout(() => setWords(i + 1), 500 + i * 1600),
     );
     return () => timers.forEach(window.clearTimeout);
   }, [ready, wordCount]);
