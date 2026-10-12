@@ -1,61 +1,64 @@
+import Image from "next/image";
 import Reveal from "./Reveal";
 
 const VALUES = [
   {
-    title: "Qualité allemande",
-    text: "Instruments et systèmes conçus et fabriqués à Tuttlingen, la référence mondiale de la technologie médico-chirurgicale.",
+    title: "Fabriqué à Tuttlingen",
+    text: "Instruments et systèmes conçus dans la capitale mondiale de la technologie médico-chirurgicale.",
   },
   {
-    title: "Fiabilité",
-    text: "Un partenaire stable pour les cliniques et hôpitaux, avec un matricule fiscal et un registre de commerce en règle.",
+    title: "Conseil par spécialité",
+    text: "Nous vous aidons à choisir le matériel adapté à votre bloc et à vos interventions.",
   },
   {
-    title: "Accompagnement",
-    text: "Conseil personnalisé pour choisir le matériel adapté à chaque spécialité et chaque bloc opératoire.",
+    title: "Suivi après l'achat",
+    text: "Un interlocuteur local pour la maintenance, les pièces et le renouvellement.",
   },
 ];
 
 export default function About() {
   return (
-    <section id="a-propos" className="relative bg-offwhite py-28">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+    <section id="a-propos" className="section bg-canvas">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <Reveal>
-            <span className="font-display text-sm font-semibold uppercase tracking-wider text-brand">
-              À propos de Tunicare Solutions
-            </span>
-            <h2 className="mt-4 font-display text-[clamp(2rem,4vw,2.75rem)] font-bold leading-tight text-deep">
-              Le pont entre l&apos;excellence médicale allemande et les
-              professionnels de santé tunisiens
+            <p className="eyebrow">À propos</p>
+            <h2 className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]">
+              Le lien entre la chirurgie allemande et les blocs opératoires tunisiens
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-deep/70">
-              Tunicare Solutions est distributeur en Tunisie de matériel
-              médico-chirurgical, fournisseur principal d&apos;AMNOTEC
-              International Medical, référence mondiale en instruments
-              chirurgicaux basée à Tuttlingen, en Allemagne.
+            <p className="mt-6 max-w-[540px] text-[18px] leading-[1.5] text-ash">
+              Tunicare Solutions distribue en Tunisie le matériel médico-chirurgical
+              d&apos;AMNOTEC International Medical, fabricant installé à Tuttlingen
+              en Allemagne. Cliniques, hôpitaux et praticiens accèdent à du
+              matériel fiable, avec un accompagnement de proximité du choix
+              jusqu&apos;au service après-vente.
             </p>
-            <p className="mt-4 text-lg leading-relaxed text-deep/70">
-              Notre mission : garantir aux cliniques, hôpitaux et
-              professionnels de santé un accès direct à du matériel fiable,
-              précis et conforme aux plus hauts standards internationaux —
-              avec un accompagnement de proximité, du choix du matériel au
-              service après-vente.
-            </p>
+
+            <div className="mt-10 flex items-center gap-5">
+              <Image
+                src="/logo-emblem.png"
+                alt=""
+                width={165}
+                height={384}
+                className="h-12 w-auto"
+              />
+              <div className="text-[14px] leading-[1.45] text-ash">
+                <p className="text-ivory">Tunicare Solutions</p>
+                <p>Mnihla, Ariana · RC C02171522025</p>
+              </div>
+            </div>
           </Reveal>
 
-          <Reveal delay={120} className="grid gap-5">
-            {VALUES.map((value) => (
-              <div
-                key={value.title}
-                className="group rounded-2xl border border-deep/10 bg-white/70 p-6 shadow-sm shadow-brand/5 transition-all hover:-translate-y-1 hover:border-cyan/40 hover:shadow-lg hover:shadow-cyan/10"
-              >
-                <h3 className="font-display text-lg font-semibold text-deep">
-                  {value.title}
-                </h3>
-                <p className="mt-2 text-deep/65">{value.text}</p>
-              </div>
+          <div className="grid gap-3">
+            {VALUES.map((value, i) => (
+              <Reveal key={value.title} delay={i * 100}>
+                <div className="card p-8">
+                  <h3 className="font-wide text-[21px] leading-[1.2]">{value.title}</h3>
+                  <p className="mt-3 text-ash">{value.text}</p>
+                </div>
+              </Reveal>
             ))}
-          </Reveal>
+          </div>
         </div>
       </div>
     </section>

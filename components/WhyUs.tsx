@@ -2,49 +2,41 @@ import Reveal from "./Reveal";
 
 const REASONS = [
   {
-    title: "Qualité Made in Germany",
-    text: "Du matériel conçu à Tuttlingen, capitale mondiale de la technologie médicale, pour une précision chirurgicale sans compromis.",
+    title: "Qualité allemande",
+    text: "Acier inoxydable médical, optiques en saphir, contrôles aux normes en vigueur pour le bloc opératoire.",
   },
   {
-    title: "Accompagnement dédié",
-    text: "Un interlocuteur unique pour vous conseiller sur le matériel adapté à votre spécialité et à votre bloc opératoire.",
+    title: "Devis sur mesure",
+    text: "Chaque demande est étudiée selon votre spécialité, votre volume et votre budget.",
   },
   {
     title: "Service après-vente",
-    text: "Suivi, maintenance et disponibilité des pièces pour assurer la continuité de vos interventions.",
+    text: "Maintenance, pièces détachées et renouvellement suivis depuis la Tunisie.",
   },
   {
-    title: "Fiabilité reconnue",
-    text: "Un partenaire structuré et en règle (RC, matricule fiscal), de confiance pour les cliniques et hôpitaux tunisiens.",
+    title: "Entreprise en règle",
+    text: "Registre de commerce et matricule fiscal tunisiens : un fournisseur fiable pour vos achats.",
   },
 ];
 
 export default function WhyUs() {
   return (
-    <section className="relative bg-offwhite py-28">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <Reveal className="mx-auto max-w-2xl text-center">
-          <span className="font-display text-sm font-semibold uppercase tracking-wider text-brand">
-            Pourquoi nous choisir
-          </span>
-          <h2 className="mt-4 font-display text-[clamp(2rem,4vw,2.75rem)] font-bold leading-tight text-deep">
+    <section className="section bg-canvas">
+      <div className="mx-auto max-w-[1200px] px-5 md:px-8">
+        <Reveal className="max-w-[640px]">
+          <p className="eyebrow">Pourquoi Tunicare</p>
+          <h2 className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]">
             La rigueur allemande, l&apos;accompagnement en plus
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-14 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {REASONS.map((reason, index) => (
-            <Reveal key={reason.title} delay={index * 100}>
-              <div className="h-full rounded-2xl border border-brand/10 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand/10">
-                <span className="font-display text-3xl font-bold text-cyan">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3 className="mt-4 font-display text-lg font-semibold text-deep">
-                  {reason.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-deep/65">
-                  {reason.text}
-                </p>
+            <Reveal key={reason.title} delay={index * 90} className="h-full">
+              <div className="card flex h-full flex-col p-8">
+                <span aria-hidden className="block h-px w-8 bg-brand" />
+                <h3 className="font-wide mt-6 text-[21px] leading-[1.2]">{reason.title}</h3>
+                <p className="mt-3 text-ash">{reason.text}</p>
               </div>
             </Reveal>
           ))}

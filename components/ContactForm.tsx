@@ -102,7 +102,7 @@ export default function ContactForm() {
           name="message"
           required
           rows={5}
-          className={inputClass}
+          className={`${inputClass} !rounded-[20px]`}
           placeholder="Décrivez votre besoin en matériel médico-chirurgical…"
         />
       </Field>
@@ -110,13 +110,13 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="w-fit rounded-full bg-coral px-8 py-3.5 font-display text-sm font-semibold text-white shadow-lg shadow-coral/30 transition-all hover:scale-105 hover:shadow-coral/50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        className="btn-primary mt-2 w-full disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit"
       >
         {status === "sending" ? "Envoi en cours…" : "Envoyer la demande"}
       </button>
 
       {status === "sent" && (
-        <p role="status" className="text-sm font-medium text-brand">
+        <p role="status" className="text-[15px] text-ash">
           Merci ! Votre demande a été transmise, nous revenons vers vous
           rapidement.
         </p>
@@ -126,7 +126,7 @@ export default function ContactForm() {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-deep/15 bg-white px-4 py-3 text-deep placeholder:text-deep/35 outline-none transition-colors focus:border-cyan focus:ring-2 focus:ring-cyan/30";
+  "w-full rounded-[32px] border border-ivory/25 bg-transparent px-5 py-3.5 text-ivory placeholder:text-ash/60 outline-none transition-colors focus:border-ivory";
 
 function Field({
   label,
@@ -139,7 +139,7 @@ function Field({
 }) {
   return (
     <label htmlFor={htmlFor} className="flex flex-col gap-2">
-      <span className="font-display text-sm font-medium text-deep/80">
+      <span className="text-[14px] text-ash">
         {label}
       </span>
       {children}

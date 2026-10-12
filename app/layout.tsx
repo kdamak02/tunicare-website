@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+// Police Archivo (variable : graisse 100–900, largeur 62–125 %) hébergée dans le projet : aucune dépendance à Google Fonts.
+const archivo = localFont({
+  variable: "--font-archivo",
+  display: "swap",
+  weight: "100 900",
+  declarations: [{ prop: "font-stretch", value: "62% 125%" }],
+  src: [
+    { path: "./fonts/archivo-latin.woff2", style: "normal" },
+    { path: "./fonts/archivo-latin-ext.woff2", style: "normal" },
+  ],
 });
 
 const siteUrl = "https://tunicare-solutions.vercel.app";
@@ -70,9 +70,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="fr"
-      className={`${spaceGrotesk.variable} ${plusJakarta.variable} h-full antialiased`}
+      className={`${archivo.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-offwhite text-deep">
+      <body className="min-h-full flex flex-col bg-canvas text-ivory">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
