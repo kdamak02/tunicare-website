@@ -1,14 +1,15 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = "https://tunicare-solutions.vercel.app";
+import { LOCALES } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: siteUrl,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1,
+  return LOCALES.map((lang) => ({
+    url: `${SITE_URL}/${lang}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: lang === "fr" ? 1 : 0.9,
+    alternates: {
+      languages: Object.fromEntries(LOCALES.map((l) => [l, `${SITE_URL}/${l}`])),
     },
-  ];
+  }));
 }

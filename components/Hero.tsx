@@ -1,14 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { trouverProduit } from "@/lib/catalogue";
+import type { Dictionary } from "@/lib/dictionaries";
+import { preparerDevis } from "@/lib/devis";
+import type { Locale } from "@/lib/i18n";
 import Intro from "./Intro";
 
 /**
  * Instruments du carrousel 3D (images détourées dans /public/images/carrousel).
- * `nom` reprend le nom du catalogue : il sert à pré-remplir la demande de devis.
+ * `id` = identifiant du produit dans lib/catalogue.ts : son nom et sa famille
+ * s'affichent automatiquement dans la bonne langue.
  * `fondu` adoucit le côté où la photo d'origine coupait l'instrument.
  */
-type Item = { src: string; nom: string; famille: string; fondu?: "left" | "bottom" };
+type Item = { src: string; id: string; fondu?: "left" | "bottom" };
 
 const MASQUES = {
   left: "linear-gradient(to right, transparent, black 22%)",
@@ -16,56 +21,46 @@ const MASQUES = {
 };
 
 const ITEMS: Item[] = [
-  { src: "/images/carrousel/laparoscopie.webp", nom: "Laparoscopie", famille: "Endoscopie", fondu: "bottom" },
-  { src: "/images/carrousel/instruments-de-base.webp", nom: "Instruments de base", famille: "Chirurgie ouverte" },
-  { src: "/images/carrousel/fluorosqan.webp", nom: "FluorosQan", famille: "Imagerie VEQTRON" },
-  { src: "/images/carrousel/endoscope.webp", nom: "Endoscopes", famille: "Endoscopie", fondu: "left" },
-  { src: "/images/carrousel/instruments-orl.webp", nom: "Instruments ORL", famille: "Chirurgie ouverte" },
-  { src: "/images/carrousel/camera-4k.webp", nom: "Caméra 4K", famille: "Imagerie VEQTRON" },
-  { src: "/images/carrousel/arthroscopie.webp", nom: "Arthroscopie", famille: "Endoscopie", fondu: "left" },
-  { src: "/images/carrousel/gynecologie.webp", nom: "Gynécologie endoscopique", famille: "Endoscopie", fondu: "left" },
-];
-
-const WORDS = [
-  { text: "Opérer.", gradient: "linear-gradient(90deg, #8fe6ea, #6cc3ea)" },
-  { text: "Explorer.", gradient: "linear-gradient(90deg, #6cc3ea, #529fe0)" },
-  { text: "Révéler.", gradient: "linear-gradient(90deg, #529fe0, #4a86d8)" },
+  { src: "/images/carrousel/laparoscopie.webp", id: "laparoscopie", fondu: "bottom" },
+  { src: "/images/carrousel/instruments-de-base.webp", id: "instruments-de-base" },
+  { src: "/images/carrousel/fluorosqan.webp", id: "fluorosqan" },
+  { src: "/images/carrousel/endoscope.webp", id: "endoscopes", fondu: "left" },
+  { src: "/images/carrousel/instruments-orl.webp", id: "instruments-orl" },
+  { src: "/images/carrousel/camera-4k.webp", id: "camera-4k" },
+  { src: "/images/carrousel/arthroscopie.webp", id: "arthroscopie", fondu: "left" },
+  { src: "/images/carrousel/gynecologie.webp", id: "gynecologie", fondu: "left" },
 ];
 
 const N = ITEMS.length;
 const STEP = (Math.PI * 2) / N;
 const AUTO_DELAY = 3200;
 
-/** Pré-remplit le formulaire de contact avec le produit choisi. */
-function preparerDevis(produit: string) {
-  const champ = document.getElementById("message") as HTMLTextAreaElement | null;
-  if (champ) champ.value = `Bonjour, je souhaite recevoir un devis pour : ${produit}.`;
-}
-
-export default function Hero() {
+export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
   const [ready, setReady] = useState(false);
   const [words, setWords] = useState(0);
   const [front, setFront] = useState(0);
   const onIntroDone = useCallback(() => setReady(true), []);
   const tourner = useRef<(delta: number) => void>(() => {});
+  const h = t.hero;
+  const wordCount = h.words.length;
 
   // Les mots du titre apparaissent un par un, comme dans la vidéo de référence
   useEffect(() => {
     if (!ready) return;
-    const timers = WORDS.map((_, i) =>
-      window.setTimeout(() => setWords(i + 1), 500 + i * AUTO_DELAY * 0.5)
+    const timers = Array.from({ length: wordCount }, (_, i) =>
+      window.setTimeout(() => setWords(i + 1), 500 + i * AUTO_DELAY * 0.5),
     );
     return () => timers.forEach(window.clearTimeout);
-  }, [ready]);
+  }, [ready, wordCount]);
 
-  const item = ITEMS[front];
+  const item = trouverProduit(lang, ITEMS[front].id);
 
   return (
     <section
       id="accueil"
       className="relative h-svh min-h-[700px] w-full overflow-hidden bg-canvas"
     >
-      <Intro onDone={onIntroDone} />
+      <Intro onDone={onIntroDone} tagline={t.intro.tagline} />
 
       {/* Lumière de scène derrière l'instrument au premier plan */}
       <div
@@ -73,43 +68,43 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(42% 38% at 50% 44%, rgba(55,117,195,0.28), rgba(55,117,195,0.06) 55%, transparent 75%)",
+            "radial-gradient(42% 38% at 50% 44%, var(--spot), var(--spot-soft) 55%, transparent 75%)",
         }}
       />
       {/* Sol : une fine ellipse qui donne l'impression d'un plateau tournant */}
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-[63%] h-[110px] w-[min(1100px,120vw)] -translate-x-1/2 rounded-[50%] md:top-[66%]"
-        style={{
-          background:
-            "radial-gradient(closest-side, rgba(237,239,245,0.07), transparent)",
-        }}
+        style={{ background: "radial-gradient(closest-side, var(--floor), transparent)" }}
       />
 
-      <Carousel ready={ready} onFrontChange={setFront} controlsRef={tourner} />
+      <Carousel
+        ready={ready}
+        onFrontChange={setFront}
+        controlsRef={tourner}
+        lang={lang}
+        label={h.carousel}
+        roleLabel={h.carouselRole}
+      />
 
       {/* Bas de page : titre à gauche, produit au premier plan + actions à droite */}
       <div className="absolute inset-x-0 bottom-0 z-[3] pb-8 md:pb-12">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-7 px-5 md:flex-row md:items-end md:justify-between md:px-8">
           <div className="max-w-[640px]">
-            <p className="eyebrow">Tunicare Solutions · Distributeur AMNOTEC</p>
+            <p className="eyebrow">{h.eyebrow}</p>
             <h1 className="font-wide mt-4 text-[clamp(34px,5.2vw,65px)] leading-[1.1]">
-              <span className="sr-only">Tunicare Solutions, matériel chirurgical allemand en Tunisie : </span>
-              {WORDS.map((w, i) => (
-                <span key={w.text}>
-                  <span
-                    className={`hero-word ${i < words ? "is-on" : ""}`}
-                    style={{ backgroundImage: w.gradient }}
-                  >
-                    {w.text}
+              <span className="sr-only">{h.srTitle}</span>
+              {h.words.map((w, i) => (
+                <span key={w}>
+                  <span className={`hero-word hero-word-${i + 1} ${i < words ? "is-on" : ""}`}>
+                    {w}
                   </span>
-                  {i < WORDS.length - 1 ? " " : ""}
+                  {i < wordCount - 1 ? " " : ""}
                 </span>
               ))}
             </h1>
             <p className="mt-4 max-w-[480px] text-[16px] text-ash md:text-[18px] md:leading-[1.35]">
-              Instruments, endoscopie et imagerie par fluorescence fabriqués à
-              Tuttlingen, pour les cliniques et hôpitaux de Tunisie.
+              {h.text}
             </p>
           </div>
 
@@ -123,7 +118,7 @@ export default function Hero() {
                 <button
                   type="button"
                   onClick={() => tourner.current(-1)}
-                  aria-label="Instrument précédent"
+                  aria-label={h.previous}
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-ivory/25 text-ivory transition-colors hover:border-ivory"
                 >
                   ←
@@ -131,7 +126,7 @@ export default function Hero() {
                 <button
                   type="button"
                   onClick={() => tourner.current(1)}
-                  aria-label="Instrument suivant"
+                  aria-label={h.next}
                   className="flex h-10 w-10 items-center justify-center rounded-full border border-ivory/25 text-ivory transition-colors hover:border-ivory"
                 >
                   →
@@ -140,10 +135,14 @@ export default function Hero() {
             </div>
             <div className="flex flex-wrap gap-3">
               <a href="#produits" className="btn-ghost">
-                Voir le catalogue
+                {h.catalogue}
               </a>
-              <a href="#contact" onClick={() => preparerDevis(item.nom)} className="btn-primary">
-                Demander un devis
+              <a
+                href="#contact"
+                onClick={() => preparerDevis(t.quoteMessage, item.nom)}
+                className="btn-primary"
+              >
+                {h.quote}
               </a>
             </div>
           </div>
@@ -161,10 +160,16 @@ function Carousel({
   ready,
   onFrontChange,
   controlsRef,
+  lang,
+  label,
+  roleLabel,
 }: {
   ready: boolean;
   onFrontChange: (index: number) => void;
   controlsRef: React.RefObject<(delta: number) => void>;
+  lang: Locale;
+  label: string;
+  roleLabel: string;
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -237,6 +242,7 @@ function Carousel({
       const radiusX = mobile ? w * 0.7 : Math.min(w * 0.4, 560);
       const base = mobile ? Math.min(w * 0.74, 320) : Math.min(w * 0.25, 360);
       const t = s.introStart ? now - s.introStart : -1;
+      const light = document.documentElement.getAttribute("data-theme") === "light";
 
       for (let i = 0; i < N; i++) {
         const el = itemRefs.current[i];
@@ -257,7 +263,8 @@ function Carousel({
         const scale = (0.32 + 0.68 * Math.pow(depth, 2.2)) * (0.75 + 0.25 * a);
         const rotY = -Math.sin(theta) * 34;
         const opacity = Math.min(1, Math.max(0, (depth - 0.3) / 0.4)) * a;
-        const brightness = 0.4 + 0.6 * Math.pow(depth, 1.5);
+        // En thème clair, on assombrit moins les instruments du fond
+        const brightness = light ? 0.85 + 0.15 * depth : 0.4 + 0.6 * Math.pow(depth, 1.5);
 
         el.style.width = `${base}px`;
         el.style.transform = `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), 0) rotateY(${rotY}deg) scale(${scale})`;
@@ -324,8 +331,8 @@ function Carousel({
       <div
         ref={stageRef}
         role="group"
-        aria-roledescription="carrousel"
-        aria-label="Instruments AMNOTEC distribués par Tunicare"
+        aria-roledescription={roleLabel}
+        aria-label={label}
         className="relative h-full w-full cursor-grab touch-pan-y select-none active:cursor-grabbing"
         style={{ perspective: "1400px" }}
         onPointerDown={onPointerDown}
@@ -337,40 +344,42 @@ function Carousel({
           if (e.key === "ArrowLeft") goTo(-1);
         }}
       >
-        {ITEMS.map((it, i) => (
-          <button
-            key={it.src}
-            ref={(el) => {
-              itemRefs.current[i] = el;
-            }}
-            type="button"
-            onClick={() => bringToFront(i)}
-            aria-label={it.nom}
-            className="absolute left-1/2 top-1/2 opacity-0 will-change-transform"
-            style={{ aspectRatio: "1.6 / 1" }}
-          >
-            {/* Ombre au sol, douce (pas d'ombre portée sur l'image) */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-x-[12%] bottom-[2%] h-[14%] rounded-[50%]"
-              style={{ background: "radial-gradient(closest-side, rgba(0,0,0,0.55), transparent)" }}
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={it.src}
-              alt={it.nom}
-              draggable={false}
-              className="pointer-events-none relative h-full w-full object-contain"
-              style={{
-                aspectRatio: "1.6 / 1",
-                maskImage: it.fondu ? MASQUES[it.fondu] : undefined,
-                WebkitMaskImage: it.fondu ? MASQUES[it.fondu] : undefined,
+        {ITEMS.map((it, i) => {
+          const nom = trouverProduit(lang, it.id).nom;
+          return (
+            <button
+              key={it.src}
+              ref={(el) => {
+                itemRefs.current[i] = el;
               }}
-            />
-          </button>
-        ))}
+              type="button"
+              onClick={() => bringToFront(i)}
+              aria-label={nom}
+              className="absolute left-1/2 top-1/2 opacity-0 will-change-transform"
+              style={{ aspectRatio: "1.6 / 1" }}
+            >
+              {/* Ombre au sol, douce (pas d'ombre portée sur l'image) */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-x-[12%] bottom-[2%] h-[14%] rounded-[50%]"
+                style={{ background: "radial-gradient(closest-side, var(--floor-shadow), transparent)" }}
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={it.src}
+                alt={nom}
+                draggable={false}
+                className="pointer-events-none relative h-full w-full object-contain"
+                style={{
+                  aspectRatio: "1.6 / 1",
+                  maskImage: it.fondu ? MASQUES[it.fondu] : undefined,
+                  WebkitMaskImage: it.fondu ? MASQUES[it.fondu] : undefined,
+                }}
+              />
+            </button>
+          );
+        })}
       </div>
-
     </div>
   );
 }

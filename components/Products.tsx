@@ -2,40 +2,35 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { FAMILLES, type Produit } from "@/lib/catalogue";
+import type { Famille, Produit } from "@/lib/catalogue";
+import type { Dictionary } from "@/lib/dictionaries";
+import { preparerDevis } from "@/lib/devis";
+import { format } from "@/lib/i18n";
 import Reveal from "./Reveal";
 
-const TOTAL = FAMILLES.reduce((n, f) => n + f.produits.length, 0);
-
-/** Pré-remplit le message du formulaire de contact avec le produit choisi. */
-function preparerDevis(produit: string) {
-  const champ = document.getElementById("message") as HTMLTextAreaElement | null;
-  if (champ) {
-    champ.value = `Bonjour, je souhaite recevoir un devis pour : ${produit}.`;
-  }
-}
-
-export default function Products() {
-  const [actif, setActif] = useState(FAMILLES[0].id);
-  const famille = FAMILLES.find((f) => f.id === actif) ?? FAMILLES[0];
+export default function Products({ t, familles }: { t: Dictionary; familles: Famille[] }) {
+  const [actif, setActif] = useState(familles[0].id);
+  const famille = familles.find((f) => f.id === actif) ?? familles[0];
+  const total = familles.reduce((n, f) => n + f.produits.length, 0);
+  const p = t.products;
 
   return (
     <section id="produits" className="section bg-canvas">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <Reveal className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="eyebrow">Catalogue · {TOTAL} gammes AMNOTEC</p>
+            <p className="eyebrow">{format(p.eyebrow, { n: total })}</p>
             <h2 className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]">
-              Choisissez votre spécialité
+              {p.title}
             </h2>
           </div>
 
           <div
             role="tablist"
-            aria-label="Familles de produits"
+            aria-label={p.tabs}
             className="flex w-full gap-1 overflow-x-auto rounded-[40px] bg-card p-1 sm:w-fit"
           >
-            {FAMILLES.map((f) => {
+            {familles.map((f) => {
               const selected = f.id === actif;
               return (
                 <button
@@ -79,7 +74,7 @@ export default function Products() {
                 className="animate-fade-up"
                 style={{ animationDelay: `${index * 60}ms` }}
               >
-                <CarteProduit produit={produit} />
+                <CarteProduit produit={produit} quote={p.quote} quoteMessage={t.quoteMessage} />
               </li>
             ))}
           </ul>
@@ -89,7 +84,15 @@ export default function Products() {
   );
 }
 
-function CarteProduit({ produit }: { produit: Produit }) {
+function CarteProduit({
+  produit,
+  quote,
+  quoteMessage,
+}: {
+  produit: Produit;
+  quote: string;
+  quoteMessage: string;
+}) {
   const detoure = produit.rendu === "detoure";
 
   return (
@@ -115,10 +118,10 @@ function CarteProduit({ produit }: { produit: Produit }) {
         </p>
         <a
           href="#contact"
-          onClick={() => preparerDevis(produit.nom)}
+          onClick={() => preparerDevis(quoteMessage, produit.nom)}
           className="mt-6 inline-flex w-fit items-center gap-3 text-[15px] text-ivory"
         >
-          Demander un devis
+          {quote}
           <span
             aria-hidden
             className="flex h-9 w-9 items-center justify-center rounded-full border border-ivory/25 text-[15px] transition-all duration-300 group-hover:rotate-45 group-hover:border-brand group-hover:bg-brand group-hover:text-white"

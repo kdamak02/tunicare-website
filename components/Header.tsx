@@ -2,15 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import type { Dictionary } from "@/lib/dictionaries";
+import { LOCALES, type Locale } from "@/lib/i18n";
+import ThemeToggle from "./ThemeToggle";
 
-const NAV_LINKS = [
-  { href: "#accueil", label: "Accueil" },
-  { href: "#a-propos", label: "À propos" },
-  { href: "#produits", label: "Produits" },
-  { href: "#contact", label: "Contact" },
-];
+type Props = { lang: Locale; t: Dictionary["nav"] };
 
-export default function Header() {
+export default function Header({ lang, t }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [current, setCurrent] = useState("#accueil");
@@ -21,16 +19,16 @@ export default function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
 
     // Met en avant le lien de la section visible
-    const sections = NAV_LINKS.map((l) => document.querySelector(l.href)).filter(
-      (el): el is Element => el !== null
-    );
+    const sections = t.links
+      .map((l) => document.querySelector(l.href))
+      .filter((el): el is Element => el !== null);
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) setCurrent(`#${entry.target.id}`);
         });
       },
-      { rootMargin: "-45% 0px -50% 0px" }
+      { rootMargin: "-45% 0px -50% 0px" },
     );
     sections.forEach((s) => observer.observe(s));
 
@@ -38,7 +36,7 @@ export default function Header() {
       window.removeEventListener("scroll", onScroll);
       observer.disconnect();
     };
-  }, []);
+  }, [t.links]);
 
   const solid = scrolled || menuOpen;
 
@@ -49,20 +47,30 @@ export default function Header() {
       }`}
     >
       <div className="mx-auto grid h-[80px] max-w-[1200px] grid-cols-[1fr_auto] items-center px-5 md:grid-cols-[1fr_auto_1fr] md:px-8">
-        <a href="#accueil" className="justify-self-start" aria-label="Tunicare Solutions, retour à l'accueil">
-          <Image
-            id="nav-logo"
-            src="/logo-dark.png"
-            alt="Tunicare Solutions"
-            width={1400}
-            height={472}
-            loading="eager"
-            className="h-10 w-auto transition-opacity duration-300 md:h-12"
-          />
+        <a href="#accueil" className="justify-self-start" aria-label={t.home}>
+          {/* Deux versions du logo : texte clair sur fond sombre, texte bleu sur fond clair */}
+          <span id="nav-logo" className="inline-block transition-opacity duration-300">
+            <Image
+              src="/logo-dark.png"
+              alt="Tunicare Solutions"
+              width={1400}
+              height={472}
+              loading="eager"
+              className="logo-for-dark h-10 w-auto md:h-12"
+            />
+            <Image
+              src="/logo-light.png"
+              alt="Tunicare Solutions"
+              width={1400}
+              height={472}
+              loading="eager"
+              className="logo-for-light h-10 w-auto md:h-12"
+            />
+          </span>
         </a>
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
-          {NAV_LINKS.map((link) => {
+        <nav className="hidden items-center gap-1 md:flex" aria-label={t.mainNav}>
+          {t.links.map((link) => {
             const isActive = current === link.href;
             return (
               <a
@@ -81,41 +89,50 @@ export default function Header() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-5 justify-self-end md:flex">
-          <a href="tel:+21623198831" className="text-[15px] text-ash transition-colors hover:text-ivory">
+        <div className="hidden items-center gap-3 justify-self-end md:flex">
+          <a
+            href="tel:+21623198831"
+            className="mr-1 hidden whitespace-nowrap text-[15px] text-ash transition-colors hover:text-ivory 2xl:inline"
+          >
             +216 23 198 831
           </a>
           <a href="#contact" className="btn-ghost !h-10 !px-5 !text-[15px]">
-            Nous contacter
+            {t.contact}
           </a>
+          <LangSwitch lang={lang} label={t.language} />
+          <ThemeToggle label={t.theme} />
         </div>
 
-        <button
-          type="button"
-          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-          className="flex h-11 w-11 items-center justify-center justify-self-end rounded-full border border-ivory/25 text-ivory md:hidden"
-        >
-          <span className="relative block h-3 w-5">
-            <span
-              className={`absolute left-0 top-0 block h-[1.5px] w-5 bg-current transition-transform ${
-                menuOpen ? "translate-y-[5px] rotate-45" : ""
-              }`}
-            />
-            <span
-              className={`absolute left-0 top-[10px] block h-[1.5px] w-5 bg-current transition-transform ${
-                menuOpen ? "-translate-y-[5px] -rotate-45" : ""
-              }`}
-            />
-          </span>
-        </button>
+        <div className="flex items-center gap-2 justify-self-end md:hidden">
+          <LangSwitch lang={lang} label={t.language} />
+          <ThemeToggle label={t.theme} className="!h-11 !w-11" />
+          <button
+            type="button"
+            aria-label={menuOpen ? t.closeMenu : t.openMenu}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-ivory/25 text-ivory"
+          >
+            <span className="relative block h-3 w-5">
+              <span
+                className={`absolute left-0 top-0 block h-[1.5px] w-5 bg-current transition-transform ${
+                  menuOpen ? "translate-y-[5px] rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`absolute left-0 top-[10px] block h-[1.5px] w-5 bg-current transition-transform ${
+                  menuOpen ? "-translate-y-[5px] -rotate-45" : ""
+                }`}
+              />
+            </span>
+          </button>
+        </div>
       </div>
 
       {menuOpen && (
         <div className="px-5 pb-8 pt-2 md:hidden">
-          <nav className="flex flex-col" aria-label="Navigation mobile">
-            {NAV_LINKS.map((link) => (
+          <nav className="flex flex-col" aria-label={t.mobileNav}>
+            {t.links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
@@ -129,11 +146,51 @@ export default function Header() {
               +216 23 198 831
             </a>
             <a href="#contact" onClick={() => setMenuOpen(false)} className="btn-primary mt-5 w-full">
-              Demander un devis
+              {t.quote}
             </a>
           </nav>
         </div>
       )}
     </header>
+  );
+}
+
+/** Sélecteur FR / EN : garde la section en cours (#produits, #contact…) en changeant de langue. */
+function LangSwitch({ lang, label }: { lang: Locale; label: string }) {
+  return (
+    <div
+      role="group"
+      aria-label={label}
+      className="flex h-10 items-center rounded-[40px] border border-ivory/25 p-[3px] max-md:h-11"
+    >
+      {LOCALES.map((l) => {
+        const active = l === lang;
+        return (
+          <a
+            key={l}
+            href={`/${l}`}
+            hrefLang={l}
+            lang={l}
+            aria-current={active ? "true" : undefined}
+            onClick={(e) => {
+              if (active) {
+                e.preventDefault();
+                return;
+              }
+              e.preventDefault();
+              // Rechargement complet volontaire : /fr et /en ont chacune leur mise en page
+              // racine, et le script de thème (clair/sombre) doit s'exécuter à nouveau.
+              // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+              window.location.assign(`/${l}${window.location.hash}`);
+            }}
+            className={`flex h-full items-center rounded-[40px] px-2.5 text-[13px] uppercase tracking-[0.04em] transition-colors ${
+              active ? "bg-ivory text-canvas" : "text-ash hover:text-ivory"
+            }`}
+          >
+            {l}
+          </a>
+        );
+      })}
+    </div>
   );
 }

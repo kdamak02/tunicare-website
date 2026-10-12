@@ -9,8 +9,8 @@ import { useEffect, useRef, useState } from "react";
  * préfère réduire les animations.
  * `onDone` doit être stable (useCallback) : sinon l'intro redémarrerait.
  */
-export default function Intro({ onDone }: { onDone: () => void }) {
-  const logoRef = useRef<HTMLImageElement>(null);
+export default function Intro({ onDone, tagline }: { onDone: () => void; tagline: string }) {
+  const logoRef = useRef<HTMLSpanElement>(null);
   const [phase, setPhase] = useState<"draw" | "fly" | "gone">("draw");
 
   useEffect(() => {
@@ -78,24 +78,23 @@ export default function Intro({ onDone }: { onDone: () => void }) {
       }`}
     >
       <div className="relative flex flex-col items-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        {/* Logo : une version par thème (texte clair sur fond sombre, bleu sur fond clair) */}
+        <span
           ref={logoRef}
-          src="/logo-dark.png"
-          alt=""
-          width={1400}
-          height={472}
-          className="h-auto w-[min(520px,72vw)] [animation:intro-reveal_1.2s_cubic-bezier(0.65,0,0.35,1)_0.2s_both] [transition:transform_0.8s_cubic-bezier(0.65,0,0.35,1)]"
-        />
+          className="block w-[min(520px,72vw)] [animation:intro-reveal_1.2s_cubic-bezier(0.65,0,0.35,1)_0.2s_both] [transition:transform_0.8s_cubic-bezier(0.65,0,0.35,1)]"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-dark.png" alt="" width={1400} height={472} className="logo-for-dark h-auto w-full" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-light.png" alt="" width={1400} height={472} className="logo-for-light h-auto w-full" />
+        </span>
         <div
           className={`flex flex-col items-center transition-opacity duration-300 ${
             phase === "fly" ? "opacity-0" : "opacity-100"
           }`}
         >
           <span className="mt-8 block h-px w-40 origin-left bg-ivory/30 [animation:intro-line_1.1s_cubic-bezier(0.65,0,0.35,1)_0.6s_both]" />
-          <span className="eyebrow mt-5 [animation:fade-up_0.8s_ease-out_1s_both]">
-            Distributeur AMNOTEC en Tunisie
-          </span>
+          <span className="eyebrow mt-5 [animation:fade-up_0.8s_ease-out_1s_both]">{tagline}</span>
         </div>
       </div>
     </div>

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import type { Dictionary } from "@/lib/dictionaries";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 const CONTACT_EMAIL = "bacem.kallel@yahoo.com";
 
-export default function ContactForm() {
+export default function ContactForm({ t }: { t: Dictionary["form"] }) {
   const [status, setStatus] = useState<Status>("idle");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -41,10 +42,10 @@ export default function ContactForm() {
 
   function openMailtoFallback(data: Record<string, FormDataEntryValue>) {
     const subject = encodeURIComponent(
-      `Demande de devis — ${data.name ?? ""}${data.company ? ` (${data.company})` : ""}`
+      `${t.mailSubject} — ${data.name ?? ""}${data.company ? ` (${data.company})` : ""}`
     );
     const body = encodeURIComponent(
-      `Nom: ${data.name ?? ""}\nSociété: ${data.company ?? "-"}\nEmail: ${data.email ?? ""}\nTéléphone: ${data.phone ?? "-"}\n\nMessage:\n${data.message ?? ""}`
+      `${t.name}: ${data.name ?? ""}\n${t.company}: ${data.company ?? "-"}\n${t.email}: ${data.email ?? ""}\n${t.phone}: ${data.phone ?? "-"}\n\n${t.message}:\n${data.message ?? ""}`
     );
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
   }
@@ -52,7 +53,7 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-5" noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Nom complet" htmlFor="name">
+        <Field label={t.name} htmlFor="name">
           <input
             id="name"
             name="name"
@@ -60,20 +61,20 @@ export default function ContactForm() {
             required
             autoComplete="name"
             className={inputClass}
-            placeholder="Votre nom"
+            placeholder={t.namePlaceholder}
           />
         </Field>
-        <Field label="Société" htmlFor="company">
+        <Field label={t.company} htmlFor="company">
           <input
             id="company"
             name="company"
             type="text"
             autoComplete="organization"
             className={inputClass}
-            placeholder="Clinique, hôpital, cabinet…"
+            placeholder={t.companyPlaceholder}
           />
         </Field>
-        <Field label="Email" htmlFor="email">
+        <Field label={t.email} htmlFor="email">
           <input
             id="email"
             name="email"
@@ -81,29 +82,29 @@ export default function ContactForm() {
             required
             autoComplete="email"
             className={inputClass}
-            placeholder="vous@exemple.com"
+            placeholder={t.emailPlaceholder}
           />
         </Field>
-        <Field label="Téléphone" htmlFor="phone">
+        <Field label={t.phone} htmlFor="phone">
           <input
             id="phone"
             name="phone"
             type="tel"
             autoComplete="tel"
             className={inputClass}
-            placeholder="+216 ..."
+            placeholder={t.phonePlaceholder}
           />
         </Field>
       </div>
 
-      <Field label="Message" htmlFor="message">
+      <Field label={t.message} htmlFor="message">
         <textarea
           id="message"
           name="message"
           required
           rows={5}
           className={`${inputClass} !rounded-[20px]`}
-          placeholder="Décrivez votre besoin en matériel médico-chirurgical…"
+          placeholder={t.messagePlaceholder}
         />
       </Field>
 
@@ -112,13 +113,12 @@ export default function ContactForm() {
         disabled={status === "sending"}
         className="btn-primary mt-2 w-full disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit"
       >
-        {status === "sending" ? "Envoi en cours…" : "Envoyer la demande"}
+        {status === "sending" ? t.sending : t.send}
       </button>
 
       {status === "sent" && (
         <p role="status" className="text-[15px] text-ash">
-          Merci ! Votre demande a été transmise, nous revenons vers vous
-          rapidement.
+          {t.sent}
         </p>
       )}
     </form>

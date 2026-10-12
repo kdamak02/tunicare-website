@@ -5,27 +5,75 @@
  * Discipline inspirée de DESIGN.md (sombre, plat, un seul accent),
  * appliquée à la palette Tunicare.
  */
+/*
+ * Deux thèmes : sombre (par défaut) et clair.
+ * Les noms décrivent un rôle, pas une couleur fixe : "ivory" = texte principal,
+ * "ash" = texte secondaire, "canvas" = fond, "card" = cartes…
+ * Le thème est posé sur <html data-theme="dark|light"> avant l'affichage (voir layout.tsx).
+ */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0b1526;
+  --card: #12203a;
+  --raised: #1a2a46;
+  --plate: #eef1f6;
+  --ivory: #edeff5;
+  --ash: #c3c9d5;
+  --slate: #6e7b92;
+  --mist: #e2e6ee;
+  --brand: #3775c3;
+  --brand-hover: #4583d3;
+  --ghost-border: rgba(237, 239, 245, 0.7);
+  --floor: rgba(237, 239, 245, 0.07);
+  --floor-shadow: rgba(0, 0, 0, 0.55);
+  --spot: rgba(55, 117, 195, 0.28);
+  --spot-soft: rgba(55, 117, 195, 0.06);
+  --word-1: #8fe6ea;
+  --word-2: #6cc3ea;
+  --word-3: #529fe0;
+  --word-4: #4a86d8;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --canvas: #f3f5f9;
+  --card: #ffffff;
+  --raised: #e7ebf2;
+  --plate: #eef1f6;
+  --ivory: #0b1526;
+  --ash: #4a5568;
+  --slate: #8a94a6;
+  --mist: #1b2a44;
+  --brand: #3775c3;
+  --brand-hover: #2f67ae;
+  --ghost-border: rgba(11, 21, 38, 0.55);
+  --floor: rgba(11, 21, 38, 0.03);
+  --floor-shadow: rgba(11, 21, 38, 0.18);
+  --spot: rgba(55, 117, 195, 0.16);
+  --spot-soft: rgba(55, 117, 195, 0.04);
+  --word-1: #1597ad;
+  --word-2: #1f86c1;
+  --word-3: #2f6fc0;
+  --word-4: #2a5ea8;
+}
+
 @theme inline {
   /* Surfaces */
-  --color-canvas: #0b1526; /* fond principal (bleu nuit Tunicare) */
-  --color-card: #12203a; /* cartes : un cran plus clair que le fond */
-  --color-raised: #1a2a46; /* surfaces interactives secondaires */
-  --color-plate: #eef1f6; /* plaque claire derrière les photos produits */
+  --color-canvas: var(--canvas); /* fond principal */
+  --color-card: var(--card); /* cartes : un cran à côté du fond */
+  --color-raised: var(--raised); /* surfaces interactives secondaires */
+  --color-plate: var(--plate); /* plaque claire derrière les photos produits */
 
   /* Texte et bordures */
-  --color-ivory: #edeff5; /* texte principal (jamais de blanc pur) */
-  --color-ash: #c3c9d5; /* texte secondaire */
-  --color-slate: #6e7b92; /* séparateurs */
-  --color-mist: #e2e6ee; /* contours fins, boutons secondaires */
+  --color-ivory: var(--ivory); /* texte principal */
+  --color-ash: var(--ash); /* texte secondaire */
+  --color-slate: var(--slate); /* séparateurs */
+  --color-mist: var(--mist); /* contours de focus */
 
   /* Accent unique : le bleu du logo, réservé à l'action principale */
-  --color-brand: #3775c3;
-  --color-brand-hover: #4583d3;
-  --color-cyan: #5be7e0; /* uniquement dans le dégradé du titre */
-
-  /* Alias conservés pour compatibilité */
-  --color-deep: #0b1526;
-  --color-offwhite: #edeff5;
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
 
   --font-display: var(--font-archivo);
   --font-sans: var(--font-archivo);
@@ -55,6 +103,7 @@
 
   body {
     background: var(--color-canvas);
+    transition: background-color 0.3s ease, color 0.3s ease;
     color: var(--color-ivory);
     font-family: var(--font-archivo), system-ui, sans-serif;
     font-size: 16px;
@@ -125,7 +174,7 @@
     height: 48px;
     padding: 0 22px;
     border-radius: 40px;
-    border: 1px solid rgba(237, 239, 245, 0.7);
+    border: 1px solid var(--ghost-border);
     color: var(--color-ivory);
     font-size: 16px;
     font-weight: 400;
@@ -133,7 +182,7 @@
     transition: background-color 0.2s, border-color 0.2s;
   }
   .btn-ghost:hover {
-    background: rgba(237, 239, 245, 0.08);
+    background: color-mix(in oklab, var(--ivory) 8%, transparent);
     border-color: var(--color-ivory);
   }
 
@@ -175,6 +224,28 @@
   }
 }
 
+/* Logo : une version par thème, une seule visible */
+.logo-for-light {
+  display: none;
+}
+:root[data-theme="light"] .logo-for-light {
+  display: block;
+}
+:root[data-theme="light"] .logo-for-dark {
+  display: none;
+}
+
+/* Icônes du bouton de thème */
+.icon-sun {
+  display: none;
+}
+:root[data-theme="light"] .icon-sun {
+  display: block;
+}
+:root[data-theme="light"] .icon-moon {
+  display: none;
+}
+
 /* Le logo de la barre est masqué pendant l'intro (il le "reçoit" à la fin) */
 html[data-intro="on"] #nav-logo {
   opacity: 0;
@@ -193,6 +264,15 @@ html[data-intro="on"] #nav-logo {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+.hero-word-1 {
+  background-image: linear-gradient(90deg, var(--word-1), var(--word-2));
+}
+.hero-word-2 {
+  background-image: linear-gradient(90deg, var(--word-2), var(--word-3));
+}
+.hero-word-3 {
+  background-image: linear-gradient(90deg, var(--word-3), var(--word-4));
 }
 .hero-word.is-on {
   opacity: 1;

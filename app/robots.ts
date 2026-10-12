@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://tunicare-solutions.vercel.app";
+import { SITE_URL as siteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
