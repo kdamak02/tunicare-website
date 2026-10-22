@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
       "Tunicare Solutions",
     ],
     authors: [{ name: "Tunicare Solutions" }],
-    icons: { icon: "/icon.png", shortcut: "/icon.png", apple: "/icon.png" },
+    icons: { icon: "/icon.png", shortcut: "/icon.png", apple: "/apple-icon.png" },
     alternates: {
       canonical: `/${lang}`,
       languages: { fr: "/fr", en: "/en", "x-default": "/fr" },
