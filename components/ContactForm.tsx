@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import type { Dictionary } from "@/lib/dictionaries";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-const CONTACT_EMAIL = "bacem.kallel@yahoo.com";
 
 export default function ContactForm({ t }: { t: Dictionary["form"] }) {
   const [status, setStatus] = useState<Status>("idle");

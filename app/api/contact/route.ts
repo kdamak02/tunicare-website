@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { CONTACT_EMAIL as SITE_CONTACT_EMAIL } from "@/lib/site";
 
 // Option A (utilisée ici) : envoi via l'API Resend (https://resend.com), gratuite
 // jusqu'à 3000 emails/mois. Nécessite RESEND_API_KEY et CONTACT_TO_EMAIL dans .env.local
@@ -9,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 // mailto: prérempli avec les informations du formulaire, ce qui ouvre le client email
 // de l'utilisateur. Fonctionne partout, sans service tiers, mais moins fluide côté UX.
 
-const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || "bacem.kallel@yahoo.com";
+const CONTACT_TO_EMAIL = process.env.CONTACT_TO_EMAIL || SITE_CONTACT_EMAIL;
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;

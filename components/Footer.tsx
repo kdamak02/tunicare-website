@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Dictionary } from "@/lib/dictionaries";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 const SOCIALS = [
   { label: "LinkedIn", href: "#" },
@@ -54,8 +55,8 @@ export default function Footer({ t }: { t: Dictionary }) {
                 </a>
               </li>
               <li>
-                <a href="mailto:bacem.kallel@yahoo.com" className="hover:text-ivory">
-                  bacem.kallel@yahoo.com
+                <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-ivory">
+                  {CONTACT_EMAIL}
                 </a>
               </li>
               <li>{t.contact.addressValue}</li>

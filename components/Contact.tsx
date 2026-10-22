@@ -1,12 +1,13 @@
 import Reveal from "./Reveal";
 import ContactForm from "./ContactForm";
 import type { Dictionary } from "@/lib/dictionaries";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export default function Contact({ t }: { t: Dictionary }) {
   const c = t.contact;
   const coordonnees = [
     { label: c.phone, value: "+216 23 198 831", href: "tel:+21623198831" },
-    { label: c.email, value: "bacem.kallel@yahoo.com", href: "mailto:bacem.kallel@yahoo.com" },
+    { label: c.email, value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
     { label: c.address, value: c.addressValue },
   ];
 
