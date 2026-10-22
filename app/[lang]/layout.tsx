@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getDictionary } from "@/lib/dictionaries";
 import { LOCALES, hasLocale } from "@/lib/i18n";
-import { SITE_URL } from "@/lib/site";
+import { CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 
 // Police Archivo (variable : graisse 100–900, largeur 62–125 %) hébergée dans le projet : aucune dépendance à Google Fonts.
 const archivo = localFont({
@@ -43,7 +43,11 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
       "Tunicare Solutions",
     ],
     authors: [{ name: "Tunicare Solutions" }],
-    icons: { icon: "/icon.png", shortcut: "/icon.png", apple: "/apple-icon.png" },
+    icons: {
+      // /favicon.ico est ajouté automatiquement par Next (app/favicon.ico).
+      icon: [{ url: "/icon.png", type: "image/png", sizes: "512x512" }],
+      apple: { url: "/apple-icon.png", sizes: "180x180" },
+    },
     alternates: {
       canonical: `/${lang}`,
       languages: { fr: "/fr", en: "/en", "x-default": "/fr" },
@@ -73,6 +77,42 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
  */
 const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem("tunicare-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();`;
 
+/**
+ * Données structurées pour Google : nom du site, logo de l'entreprise et coordonnées.
+ * Aide Google à afficher « Tunicare Solutions » et le logo dans les résultats de recherche.
+ */
+function structuredData(lang: string) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        name: "Tunicare Solutions",
+        alternateName: "Tunicare",
+        url: `${SITE_URL}/`,
+        inLanguage: lang,
+      },
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: "Tunicare Solutions",
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/icon.png`,
+        email: CONTACT_EMAIL,
+        telephone: "+216 23 198 831",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Av. Les Violettes, Imm. Les Jardins, Jmazh 2, Mnihla",
+          addressLocality: "Ariana",
+          postalCode: "2094",
+          addressCountry: "TN",
+        },
+      },
+    ],
+  };
+}
+
 export default async function RootLayout({ children, params }: LayoutProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
@@ -86,6 +126,10 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(lang)) }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-canvas text-ivory">
         <Header lang={lang} t={dict.nav} />
