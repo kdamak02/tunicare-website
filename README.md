@@ -1,5 +1,8 @@
 # Tunicare Solutions — Site vitrine
 
+> **Live: [www.tunicare.tn](https://www.tunicare.tn)** · Freelance project by [Khalil Damak](https://github.com/kdamak02), designed, built and deployed for the client.
+> Corporate website for a medical-surgical equipment distributor in Tunisia: Next.js (App Router), TypeScript, Tailwind CSS v4, contact form API with Resend, SEO (sitemap, Open Graph), deployed on Vercel.
+
 Site vitrine de Tunicare Solutions, distributeur en Tunisie de matériel
 médico-chirurgical, partenaire d'AMNOTEC International Medical (Tuttlingen,
 Allemagne). Construit avec Next.js 14+ (App Router), TypeScript et Tailwind
