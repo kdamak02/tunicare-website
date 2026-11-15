@@ -5,7 +5,13 @@ import { trouverProduit } from "@/lib/catalogue";
 import type { Dictionary } from "@/lib/dictionaries";
 import { preparerDevis } from "@/lib/devis";
 import type { Locale } from "@/lib/i18n";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 import Intro from "./Intro";
+import Magnetic from "./Magnetic";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /**
  * Instruments du carrousel 3D (images détourées dans /public/images/carrousel).
@@ -33,7 +39,7 @@ const ITEMS: Item[] = [
 
 const N = ITEMS.length;
 const STEP = (Math.PI * 2) / N;
-const AUTO_DELAY = 2000; // un instrument toutes les 2 secondes
+const SPIN_SPEED = 1 / 2200; // rotation continue : environ un instrument toutes les 2,2 secondes
 
 export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
   const [ready, setReady] = useState(false);
@@ -55,8 +61,21 @@ export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
 
   const item = trouverProduit(lang, ITEMS[front].id);
 
+  // En quittant l'accueil, les instruments s'enfoncent et le texte remonte en s'effaçant
+  const sectionRef = useRef<HTMLElement>(null);
+  useGSAP(
+    () => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const scrub = { trigger: sectionRef.current, start: "top top", end: "bottom top", scrub: true };
+      gsap.to(".hero-stage", { yPercent: 18, scale: 0.88, opacity: 0.25, ease: "none", scrollTrigger: scrub });
+      gsap.to(".hero-bottom", { y: -80, opacity: 0, ease: "none", scrollTrigger: { ...scrub, end: "60% top" } });
+    },
+    { scope: sectionRef }
+  );
+
   return (
     <section
+      ref={sectionRef}
       id="accueil"
       className="relative h-svh min-h-[700px] w-full overflow-hidden bg-canvas"
     >
@@ -93,7 +112,7 @@ export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
       />
 
       {/* Bas de page : titre à gauche, produit au premier plan + actions à droite */}
-      <div className="absolute inset-x-0 bottom-0 z-[3] pb-8 md:pb-12">
+      <div className="hero-bottom absolute inset-x-0 bottom-0 z-[3] pb-8 md:pb-12">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-7 px-5 md:flex-row md:items-end md:justify-between md:px-8">
           <div className="max-w-[640px]">
             <p className="eyebrow hidden md:block">{h.eyebrow}</p>
@@ -139,16 +158,20 @@ export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              <a href="#produits" className="btn-ghost">
-                {h.catalogue}
-              </a>
-              <a
-                href="#contact"
-                onClick={() => preparerDevis(t.quoteMessage, item.nom)}
-                className="btn-primary"
-              >
-                {h.quote}
-              </a>
+              <Magnetic>
+                <a href="#produits" className="btn-ghost">
+                  {h.catalogue}
+                </a>
+              </Magnetic>
+              <Magnetic>
+                <a
+                  href="#contact"
+                  onClick={() => preparerDevis(t.quoteMessage, item.nom)}
+                  className="btn-primary"
+                >
+                  {h.quote}
+                </a>
+              </Magnetic>
             </div>
           </div>
         </div>
@@ -159,7 +182,7 @@ export default function Hero({ lang, t }: { lang: Locale; t: Dictionary }) {
 
 /**
  * Carrousel 3D : les instruments sont posés sur un anneau qui tourne.
- * Rotation automatique, glisser pour tourner, clic sur un instrument pour l'amener devant.
+ * Rotation continue ; un clic sur un instrument l'arrête et l'amène devant, un second clic relance. Glisser pour tourner.
  */
 function Carousel({
   ready,
@@ -185,16 +208,16 @@ function Carousel({
     dragStartX: 0,
     dragStartPos: 0,
     moved: 0,
-    hover: false,
-    lastAuto: 0,
+    spinning: true, // tourne sans arrêt ; un clic l'arrête, un autre clic le relance
     introStart: 0,
     front: 0,
   });
 
+  // Flèches : arrêtent la rotation et avancent d'un instrument
   const goTo = useCallback((delta: number) => {
     const s = state.current;
-    s.target = Math.round(s.target) + delta;
-    s.lastAuto = performance.now();
+    s.spinning = false;
+    s.target = Math.round(s.pos) + delta;
   }, []);
 
   // Les flèches du bas de page pilotent le carrousel
@@ -203,10 +226,7 @@ function Carousel({
   }, [controlsRef, goTo]);
 
   useEffect(() => {
-    if (ready) {
-      state.current.introStart = performance.now();
-      state.current.lastAuto = performance.now() + 1200;
-    }
+    if (ready) state.current.introStart = performance.now();
   }, [ready]);
 
   useEffect(() => {
@@ -224,20 +244,12 @@ function Carousel({
         return;
       }
 
-      // Rotation automatique (en pause au survol, pendant le glisser, ou si l'onglet est caché)
-      if (
-        s.introStart &&
-        !reduced &&
-        !s.dragging &&
-        !s.hover &&
-        !document.hidden &&
-        now - s.lastAuto > AUTO_DELAY
-      ) {
-        s.target = Math.round(s.target) + 1;
-        s.lastAuto = now;
-      }
-
-      if (!s.dragging) {
+      // Rotation continue (sauf pendant l'intro, le glisser, ou si on l'a arrêtée d'un clic)
+      const spin = s.spinning && s.introStart && !reduced && !s.dragging && now - s.introStart > 1200;
+      if (spin) {
+        s.pos += SPIN_SPEED * dt;
+        s.target = s.pos;
+      } else if (!s.dragging) {
         const k = reduced ? 1 : 1 - Math.pow(1 - 0.075, dt / 16.7);
         s.pos += (s.target - s.pos) * k;
       }
@@ -309,29 +321,47 @@ function Carousel({
     const w = stageRef.current?.clientWidth ?? 1000;
     s.pos = s.dragStartPos - dx / (w * 0.32);
   };
-  const onPointerUp = () => {
+  const bringToFront = useCallback((i: number) => {
+    const s = state.current;
+    // L'instrument cliqué est déjà arrêté devant : on relance la rotation
+    if (!s.spinning && i === s.front && Math.abs(s.pos - Math.round(s.pos)) < 0.05) {
+      s.spinning = true;
+      return;
+    }
+    // Sinon : on arrête la rotation et on amène l'instrument cliqué devant
+    s.spinning = false;
+    let rel = (i - s.pos) % N;
+    if (rel > N / 2) rel -= N;
+    if (rel < -N / 2) rel += N;
+    s.target = Math.round(s.pos + rel);
+  }, []);
+
+  // Fin du glisser. Si la souris n'a presque pas bougé, c'est un clic :
+  // sur un instrument → arrêt et instrument devant ; ailleurs dans le carrousel → arrêt / reprise.
+  // (Le carrousel capture le pointeur, donc on retrouve nous-mêmes l'instrument sous la souris.)
+  const onPointerUp = (e: React.PointerEvent) => {
     const s = state.current;
     if (!s.dragging) return;
     s.dragging = false;
-    s.target = Math.round(s.pos);
-    s.lastAuto = performance.now();
+    if (s.moved > 6) {
+      s.target = s.spinning ? s.pos : Math.round(s.pos);
+      return;
+    }
+    const hit = document.elementFromPoint(e.clientX, e.clientY)?.closest("button");
+    const i = itemRefs.current.findIndex((el) => el === hit);
+    if (i >= 0) {
+      bringToFront(i);
+    } else if (s.spinning) {
+      s.spinning = false;
+      s.target = Math.round(s.pos);
+    } else {
+      s.spinning = true;
+    }
   };
-
-  const bringToFront = useCallback((i: number) => {
-    const s = state.current;
-    if (s.moved > 6) return; // c'était un glisser, pas un clic
-    let rel = (i - s.target) % N;
-    if (rel > N / 2) rel -= N;
-    if (rel < -N / 2) rel += N;
-    s.target = Math.round(s.target + rel);
-    s.lastAuto = performance.now();
-  }, []);
 
   return (
     <div
-      className="absolute inset-x-0 top-[10%] z-[2] h-[42%] md:top-[11%] md:h-[56%]"
-      onMouseEnter={() => (state.current.hover = true)}
-      onMouseLeave={() => (state.current.hover = false)}
+      className="hero-stage absolute inset-x-0 top-[10%] z-[2] h-[42%] md:top-[11%] md:h-[56%]"
     >
       <div
         ref={stageRef}
@@ -343,7 +373,11 @@ function Carousel({
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={() => {
+          const s = state.current;
+          s.dragging = false;
+          s.target = s.spinning ? s.pos : Math.round(s.pos);
+        }}
         onKeyDown={(e) => {
           if (e.key === "ArrowRight") goTo(1);
           if (e.key === "ArrowLeft") goTo(-1);
@@ -358,7 +392,10 @@ function Carousel({
                 itemRefs.current[i] = el;
               }}
               type="button"
-              onClick={() => bringToFront(i)}
+              // Au clavier (Entrée / Espace) ; les clics de souris passent par onPointerUp
+              onClick={(e) => {
+                if (e.detail === 0) bringToFront(i);
+              }}
               aria-label={nom}
               className="absolute left-1/2 top-1/2 opacity-0 will-change-transform"
               style={{ aspectRatio: "1.6 / 1" }}

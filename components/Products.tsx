@@ -7,6 +7,8 @@ import type { Dictionary } from "@/lib/dictionaries";
 import { preparerDevis } from "@/lib/devis";
 import { format } from "@/lib/i18n";
 import Reveal from "./Reveal";
+import BlurText from "./BlurText";
+import Tilt from "./Tilt";
 
 export default function Products({ t, familles }: { t: Dictionary; familles: Famille[] }) {
   const [actif, setActif] = useState(familles[0].id);
@@ -20,9 +22,10 @@ export default function Products({ t, familles }: { t: Dictionary; familles: Fam
         <Reveal className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="eyebrow">{format(p.eyebrow, { n: total })}</p>
-            <h2 className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]">
-              {p.title}
-            </h2>
+            <BlurText
+              text={p.title}
+              className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]"
+            />
           </div>
 
           <div
@@ -74,7 +77,9 @@ export default function Products({ t, familles }: { t: Dictionary; familles: Fam
                 className="animate-fade-up"
                 style={{ animationDelay: `${index * 60}ms` }}
               >
-                <CarteProduit produit={produit} quote={p.quote} quoteMessage={t.quoteMessage} />
+                <Tilt className="h-full">
+                  <CarteProduit produit={produit} quote={p.quote} quoteMessage={t.quoteMessage} />
+                </Tilt>
               </li>
             ))}
           </ul>

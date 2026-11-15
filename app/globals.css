@@ -292,17 +292,33 @@ html[data-intro="on"] #nav-logo {
 }
 
 /* ---------- Apparition au défilement ---------- */
+/* Caché jusqu'à ce que GSAP le fasse apparaître (voir components/Reveal.tsx) */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.reveal.in-view {
+/* ---------- Halo qui suit la souris (components/SpotlightCard.tsx) ---------- */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    var(--spot),
+    transparent 70%
+  );
+}
+.spotlight:hover::before {
   opacity: 1;
-  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -317,6 +333,5 @@ html[data-intro="on"] #nav-logo {
 
   .reveal {
     opacity: 1;
-    transform: none;
   }
 }

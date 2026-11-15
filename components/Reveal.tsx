@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type RevealProps = {
   children: React.ReactNode;
@@ -8,34 +13,38 @@ type RevealProps = {
   delay?: number;
 };
 
-/** Fades + slides a section into view once, the first time it crosses the viewport. */
+/** Fait apparaître un bloc (fondu + flou + glissement) la première fois qu'il entre à l'écran. */
 export default function Reveal({ children, className = "", delay = 0 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("in-view");
-          observer.unobserve(entry.target);
+  useGSAP(
+    () => {
+      const node = ref.current;
+      if (!node) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(node, { opacity: 1 });
+        return;
+      }
+      gsap.fromTo(
+        node,
+        { opacity: 0, y: 40, filter: "blur(8px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1,
+          delay: delay / 1000,
+          ease: "power3.out",
+          clearProps: "filter",
+          scrollTrigger: { trigger: node, start: "top 88%", once: true },
         }
-      },
-      { threshold: 0.15 }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+      );
+    },
+    { scope: ref }
+  );
 
   return (
-    <div
-      ref={ref}
-      className={`reveal ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
+    <div ref={ref} className={`reveal ${className}`}>
       {children}
     </div>
   );

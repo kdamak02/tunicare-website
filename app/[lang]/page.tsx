@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
+import Marquee from "@/components/Marquee";
 import About from "@/components/About";
 import Products from "@/components/Products";
 import WhyUs from "@/components/WhyUs";
@@ -16,6 +17,10 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   return (
     <>
       <Hero lang={lang} t={t} />
+      <Marquee
+        label={t.products.title}
+        items={getCatalogue(lang).flatMap((f) => f.produits.map((p) => p.nom))}
+      />
       <About t={t.about} />
       <Products t={t} familles={getCatalogue(lang)} />
       <WhyUs t={t.why} />

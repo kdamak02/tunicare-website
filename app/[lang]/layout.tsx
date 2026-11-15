@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import "../globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SmoothScroll from "@/components/SmoothScroll";
+import ScrollProgress from "@/components/ScrollProgress";
 import { getDictionary } from "@/lib/dictionaries";
 import { LOCALES, hasLocale } from "@/lib/i18n";
 import { CONTACT_EMAIL, SITE_URL } from "@/lib/site";
@@ -132,6 +134,8 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         />
       </head>
       <body className="min-h-full flex flex-col bg-canvas text-ivory">
+        <SmoothScroll />
+        <ScrollProgress />
         <Header lang={lang} t={dict.nav} />
         <main className="flex-1">{children}</main>
         <Footer t={dict} />

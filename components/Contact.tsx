@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import BlurText from "./BlurText";
 import ContactForm from "./ContactForm";
 import type { Dictionary } from "@/lib/dictionaries";
 import { CONTACT_EMAIL } from "@/lib/site";
@@ -16,9 +17,10 @@ export default function Contact({ t }: { t: Dictionary }) {
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <Reveal className="max-w-[640px]">
           <p className="eyebrow">{c.eyebrow}</p>
-          <h2 className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]">
-            {c.title}
-          </h2>
+          <BlurText
+            text={c.title}
+            className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]"
+          />
           <p className="mt-5 text-[18px] leading-[1.35] text-ash">
             {c.text}
           </p>
