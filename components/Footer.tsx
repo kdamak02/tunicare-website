@@ -8,7 +8,7 @@ const SOCIALS = [
   { label: "Instagram", href: "#" },
 ];
 
-export default function Footer({ t }: { t: Dictionary }) {
+export default function Footer({ lang, t }: { lang: string; t: Dictionary }) {
   const f = t.footer;
 
   return (
@@ -38,7 +38,7 @@ export default function Footer({ t }: { t: Dictionary }) {
             <ul className="mt-4 space-y-2.5 text-[15px] text-ash">
               {t.nav.links.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="hover:text-ivory">
+                  <a href={`/${lang}${link.href}`} className="hover:text-ivory">
                     {link.label}
                   </a>
                 </li>

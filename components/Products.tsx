@@ -1,16 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import type { Famille, Produit } from "@/lib/catalogue";
 import type { Dictionary } from "@/lib/dictionaries";
 import { preparerDevis } from "@/lib/devis";
-import { format } from "@/lib/i18n";
+import { format, type Locale } from "@/lib/i18n";
 import Reveal from "./Reveal";
 import BlurText from "./BlurText";
 import Tilt from "./Tilt";
 
-export default function Products({ t, familles }: { t: Dictionary; familles: Famille[] }) {
+export default function Products({ lang, t, familles }: { lang: Locale; t: Dictionary; familles: Famille[] }) {
   const [actif, setActif] = useState(familles[0].id);
   const famille = familles.find((f) => f.id === actif) ?? familles[0];
   const total = familles.reduce((n, f) => n + f.produits.length, 0);
@@ -78,7 +79,13 @@ export default function Products({ t, familles }: { t: Dictionary; familles: Fam
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <Tilt className="h-full">
-                  <CarteProduit produit={produit} quote={p.quote} quoteMessage={t.quoteMessage} />
+                  <CarteProduit
+                    produit={produit}
+                    href={`/${lang}/produits/${produit.id}`}
+                    details={t.product.seeDetails}
+                    quote={p.quote}
+                    quoteMessage={t.quoteMessage}
+                  />
                 </Tilt>
               </li>
             ))}
@@ -91,17 +98,21 @@ export default function Products({ t, familles }: { t: Dictionary; familles: Fam
 
 function CarteProduit({
   produit,
+  href,
+  details,
   quote,
   quoteMessage,
 }: {
   produit: Produit;
+  href: string;
+  details: string;
   quote: string;
   quoteMessage: string;
 }) {
   const detoure = produit.rendu === "detoure";
 
   return (
-    <article className="card group flex h-full flex-col p-3">
+    <article className="card group relative flex h-full flex-col p-3">
       <div className="relative aspect-[3/2] overflow-hidden rounded-[8px] bg-plate">
         <Image
           src={produit.image}
@@ -116,24 +127,32 @@ function CarteProduit({
 
       <div className="flex flex-1 flex-col px-5 pb-5 pt-6">
         <h3 className="font-wide text-[21px] leading-[1.2]">
-          {produit.nom}
+          {/* Le lien couvre toute la carte (voir ::after) : un clic n'importe où ouvre la page produit */}
+          <Link href={href} className="after:absolute after:inset-0 after:rounded-[12px] after:content-['']">
+            {produit.nom}
+          </Link>
         </h3>
         <p className="mt-3 flex-1 text-[15px] leading-[1.5] text-ash">
           {produit.description}
         </p>
-        <a
-          href="#contact"
-          onClick={() => preparerDevis(quoteMessage, produit.nom)}
-          className="mt-6 inline-flex w-fit items-center gap-3 text-[15px] text-ivory"
-        >
-          {quote}
-          <span
-            aria-hidden
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-ivory/25 text-[15px] transition-all duration-300 group-hover:rotate-45 group-hover:border-brand group-hover:bg-brand group-hover:text-white"
+        <div className="relative z-[1] mt-6 flex flex-wrap items-center justify-between gap-3">
+          <a
+            href="#contact"
+            onClick={() => preparerDevis(quoteMessage, produit.nom)}
+            className="text-[15px] text-ash underline-offset-4 transition-colors hover:text-ivory hover:underline"
           >
-            ↗
-          </span>
-        </a>
+            {quote}
+          </a>
+          <Link href={href} className="inline-flex items-center gap-3 text-[15px] text-ivory">
+            {details}
+            <span
+              aria-hidden
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-ivory/25 text-[15px] transition-all duration-300 group-hover:rotate-45 group-hover:border-brand group-hover:bg-brand group-hover:text-white"
+            >
+              ↗
+            </span>
+          </Link>
+        </div>
       </div>
     </article>
   );

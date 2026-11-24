@@ -22,7 +22,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         items={getCatalogue(lang).flatMap((f) => f.produits.map((p) => p.nom))}
       />
       <About t={t.about} />
-      <Products t={t} familles={getCatalogue(lang)} />
+      <Products lang={lang} t={t} familles={getCatalogue(lang)} />
       <WhyUs t={t.why} />
       <Contact t={t} />
     </>

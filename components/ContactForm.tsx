@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dictionary } from "@/lib/dictionaries";
 import { CONTACT_EMAIL } from "@/lib/site";
+import { reprendreDevis } from "@/lib/devis";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 
 export default function ContactForm({ t }: { t: Dictionary["form"] }) {
   const [status, setStatus] = useState<Status>("idle");
+
+  // Demande de devis lancée depuis une page produit
+  useEffect(() => {
+    const texte = reprendreDevis();
+    const champ = document.getElementById("message") as HTMLTextAreaElement | null;
+    if (texte && champ) champ.value = texte;
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import type { Dictionary } from "@/lib/dictionaries";
 import { LOCALES, type Locale } from "@/lib/i18n";
 import ThemeToggle from "./ThemeToggle";
@@ -12,6 +13,9 @@ export default function Header({ lang, t }: Props) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [current, setCurrent] = useState("#accueil");
+  // Sur une page produit, les liens d'ancre ramènent à l'accueil (/fr#contact…)
+  const pathname = usePathname();
+  const base = pathname === `/${lang}` ? "" : `/${lang}`;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -47,7 +51,7 @@ export default function Header({ lang, t }: Props) {
       }`}
     >
       <div className="mx-auto grid h-[80px] max-w-[1200px] grid-cols-[1fr_auto] items-center px-5 md:grid-cols-[1fr_auto_1fr] md:px-8">
-        <a href="#accueil" className="justify-self-start" aria-label={t.home}>
+        <a href={`${base}#accueil`} className="justify-self-start" aria-label={t.home}>
           {/* Deux versions du logo : texte clair sur fond sombre, texte bleu sur fond clair */}
           <span id="nav-logo" className="inline-block transition-opacity duration-300">
             <Image
@@ -71,11 +75,11 @@ export default function Header({ lang, t }: Props) {
 
         <nav className="hidden items-center gap-1 md:flex" aria-label={t.mainNav}>
           {t.links.map((link) => {
-            const isActive = current === link.href;
+            const isActive = base === "" && current === link.href;
             return (
               <a
                 key={link.href}
-                href={link.href}
+                href={`${base}${link.href}`}
                 aria-current={isActive ? "true" : undefined}
                 className={`rounded-[40px] px-4 py-2 text-[15px] transition-colors ${
                   isActive
@@ -96,7 +100,7 @@ export default function Header({ lang, t }: Props) {
           >
             +216 23 198 831
           </a>
-          <a href="#contact" className="btn-ghost !h-10 !px-5 !text-[15px]">
+          <a href={`${base}#contact`} className="btn-ghost !h-10 !px-5 !text-[15px]">
             {t.contact}
           </a>
           <LangSwitch lang={lang} label={t.language} />
@@ -135,7 +139,7 @@ export default function Header({ lang, t }: Props) {
             {t.links.map((link) => (
               <a
                 key={link.href}
-                href={link.href}
+                href={`${base}${link.href}`}
                 onClick={() => setMenuOpen(false)}
                 className="font-wide border-b border-ivory/10 py-4 text-2xl text-ivory"
               >
@@ -145,7 +149,7 @@ export default function Header({ lang, t }: Props) {
             <a href="tel:+21623198831" className="mt-6 text-ash">
               +216 23 198 831
             </a>
-            <a href="#contact" onClick={() => setMenuOpen(false)} className="btn-primary mt-5 w-full">
+            <a href={`${base}#contact`} onClick={() => setMenuOpen(false)} className="btn-primary mt-5 w-full">
               {t.quote}
             </a>
           </nav>
@@ -155,7 +159,7 @@ export default function Header({ lang, t }: Props) {
   );
 }
 
-/** Sélecteur FR / EN : garde la section en cours (#produits, #contact…) en changeant de langue. */
+/** Sélecteur FR / EN : garde la page et la section en cours (#produits, #contact…) en changeant de langue. */
 function LangSwitch({ lang, label }: { lang: Locale; label: string }) {
   return (
     <div
@@ -180,8 +184,9 @@ function LangSwitch({ lang, label }: { lang: Locale; label: string }) {
               e.preventDefault();
               // Rechargement complet volontaire : /fr et /en ont chacune leur mise en page
               // racine, et le script de thème (clair/sombre) doit s'exécuter à nouveau.
-              // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-              window.location.assign(`/${l}${window.location.hash}`);
+              window.location.assign(
+                window.location.pathname.replace(/^\/[a-z]{2}(?=\/|$)/, `/${l}`) + window.location.hash,
+              );
             }}
             className={`flex h-full items-center rounded-[40px] px-2.5 text-[13px] uppercase tracking-[0.04em] transition-colors ${
               active ? "bg-ivory text-canvas" : "text-ash hover:text-ivory"

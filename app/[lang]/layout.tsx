@@ -138,7 +138,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         <ScrollProgress />
         <Header lang={lang} t={dict.nav} />
         <main className="flex-1">{children}</main>
-        <Footer t={dict} />
+        <Footer lang={lang} t={dict} />
       </body>
     </html>
   );
