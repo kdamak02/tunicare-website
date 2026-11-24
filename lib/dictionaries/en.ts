@@ -27,6 +27,7 @@ const en: Dictionary = {
     mobileNav: "Mobile navigation",
     theme: "Switch theme (light or dark)",
     language: "Site language",
+    allProducts: "View the full catalogue",
   },
   intro: {
     tagline: "AMNOTEC distributor in Tunisia",

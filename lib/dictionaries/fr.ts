@@ -25,6 +25,7 @@ const fr = {
     mobileNav: "Navigation mobile",
     theme: "Changer de thème (clair ou sombre)",
     language: "Langue du site",
+    allProducts: "Voir tout le catalogue",
   },
   intro: {
     tagline: "Distributeur AMNOTEC en Tunisie",

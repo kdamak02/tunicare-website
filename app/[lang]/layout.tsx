@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import Header from "@/components/Header";
+import { getCatalogue } from "@/lib/catalogue";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -136,7 +137,15 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       <body className="min-h-full flex flex-col bg-canvas text-ivory">
         <SmoothScroll />
         <ScrollProgress />
-        <Header lang={lang} t={dict.nav} />
+        <Header
+          lang={lang}
+          t={dict.nav}
+          menu={getCatalogue(lang).map((f) => ({
+            id: f.id,
+            nom: f.nom,
+            produits: f.produits.map(({ id, nom, image, rendu }) => ({ id, nom, image, rendu })),
+          }))}
+        />
         <main className="flex-1">{children}</main>
         <Footer lang={lang} t={dict} />
       </body>

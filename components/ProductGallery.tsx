@@ -37,7 +37,7 @@ export default function ProductGallery({
         type="button"
         onClick={() => setOuvert(true)}
         aria-label={`${alt} — ${t.zoomHint}`}
-        className={`group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-[12px] ${
+        className={`pi-media group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-[12px] ${
           photo.rendu === "detoure" ? "bg-white" : "bg-plate"
         }`}
       >
@@ -66,7 +66,7 @@ export default function ProductGallery({
           aria-label={t.gallery}
         >
           {photos.map((p, i) => (
-            <li key={p.src}>
+            <li key={p.src} className="pi-thumb">
               <button
                 type="button"
                 onClick={() => setActif(i)}
