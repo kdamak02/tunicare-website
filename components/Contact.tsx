@@ -13,10 +13,10 @@ export default function Contact({ t }: { t: Dictionary }) {
   ];
 
   return (
-    <section id="contact" className="section bg-canvas">
+    <section id="contact" className="section">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <Reveal className="max-w-[640px]">
-          <p className="eyebrow">{c.eyebrow}</p>
+          <p className="eyebrow section-eyebrow">{c.eyebrow}</p>
           <BlurText
             text={c.title}
             className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]"

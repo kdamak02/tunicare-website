@@ -5,10 +5,10 @@ import SpotlightCard from "./SpotlightCard";
 
 export default function WhyUs({ t }: { t: Dictionary["why"] }) {
   return (
-    <section className="section bg-canvas">
+    <section id="pourquoi" className="section">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <Reveal className="max-w-[640px]">
-          <p className="eyebrow">{t.eyebrow}</p>
+          <p className="eyebrow section-eyebrow">{t.eyebrow}</p>
           <BlurText
             text={t.title}
             className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]"

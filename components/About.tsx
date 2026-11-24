@@ -6,11 +6,11 @@ import SpotlightCard from "./SpotlightCard";
 
 export default function About({ t }: { t: Dictionary["about"] }) {
   return (
-    <section id="a-propos" className="section bg-canvas">
+    <section id="a-propos" className="section">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <Reveal>
-            <p className="eyebrow">{t.eyebrow}</p>
+            <p className="eyebrow section-eyebrow">{t.eyebrow}</p>
             <BlurText
               text={t.title}
               className="font-wide mt-5 text-[clamp(28px,3.4vw,42px)] leading-[1.15]"

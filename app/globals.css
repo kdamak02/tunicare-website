@@ -15,6 +15,7 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
   --canvas: #0b1526;
+  --canvas-alt: #0f1d35; /* fond des sections alternées */
   --card: #12203a;
   --raised: #1a2a46;
   --plate: #eef1f6;
@@ -38,6 +39,7 @@
 :root[data-theme="light"] {
   color-scheme: light;
   --canvas: #f3f5f9;
+  --canvas-alt: #e8edf5;
   --card: #ffffff;
   --raised: #e7ebf2;
   --plate: #eef1f6;
@@ -61,6 +63,7 @@
 @theme inline {
   /* Surfaces */
   --color-canvas: var(--canvas); /* fond principal */
+  --color-canvas-alt: var(--canvas-alt); /* fond des sections alternées */
   --color-card: var(--card); /* cartes : un cran à côté du fond */
   --color-raised: var(--raised); /* surfaces interactives secondaires */
   --color-plate: var(--plate); /* plaque claire derrière les photos produits */
@@ -198,6 +201,32 @@
   @media (min-width: 768px) {
     .section {
       padding-top: 128px;
+      padding-bottom: 128px;
+    }
+  }
+  /* Section posée dans une « feuille » (SectionSheet) : le fond vient de la feuille,
+     et le repère 01 — … tient lieu de marge haute. Marge basse agrandie pour le chevauchement. */
+  /* Le repère de la feuille affiche déjà le nom de la section */
+  .sheet .section-eyebrow {
+    display: none;
+  }
+  .sheet > section {
+    background: transparent;
+    padding-top: 56px;
+    padding-bottom: 136px;
+  }
+  @media (min-width: 768px) {
+    .sheet > section {
+      padding-top: 72px;
+      padding-bottom: 184px;
+    }
+  }
+  /* Dernière feuille : rien ne la recouvre, marge basse normale */
+  .sheet-last > section {
+    padding-bottom: 96px;
+  }
+  @media (min-width: 768px) {
+    .sheet-last > section {
       padding-bottom: 128px;
     }
   }

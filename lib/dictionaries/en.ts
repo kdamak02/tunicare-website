@@ -28,6 +28,7 @@ const en: Dictionary = {
     theme: "Switch theme (light or dark)",
     language: "Site language",
     allProducts: "View the full catalogue",
+    sections: "Page sections",
   },
   intro: {
     tagline: "AMNOTEC distributor in Tunisia",

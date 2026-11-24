@@ -18,7 +18,7 @@ export default function Products({ lang, t, familles }: { lang: Locale; t: Dicti
   const p = t.products;
 
   return (
-    <section id="produits" className="section bg-canvas">
+    <section id="produits" className="section">
       <div className="mx-auto max-w-[1200px] px-5 md:px-8">
         <Reveal className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
